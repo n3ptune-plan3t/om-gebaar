@@ -28,9 +28,9 @@ jobs:
 
       - name: Download Sources
         run: |
-          # Download the source tarball directly from GitHub
+          # Download the source tarball directly from GitHub using curl
           cd ~/rpmbuild/SOURCES/
-          wget -q https://github.com/9ary/gebaar-libinput-fork/archive/refs/tags/v0.1.5.tar.gz
+          curl -L -o v0.1.5.tar.gz https://github.com/9ary/gebaar-libinput-fork/archive/refs/tags/v0.1.5.tar.gz
           # Verify the download
           ls -lh v0.1.5.tar.gz
 
