@@ -1,0 +1,36 @@
+name: OpenMandriva CI
+on: [push, pull_request]
+
+jobs:
+  build-rpm:
+    runs-on: ubuntu-latest
+    container:
+      # 'cooker' is the rolling dev branch, 'rolling' is the stable rolling
+      image: openmandriva/cooker 
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Build Environment
+        run: |
+          # Install the 'build' metapackage which contains essential macros
+          dnf install -y rpm-openmandriva-setup-build dnf-utils spectool
+          # Automatically install all BuildRequires from the spec
+          dnf builddep -y gebaar-libinput-fork.spec
+
+      - name: Prepare Sources
+        run: |
+          mkdir -p ~/rpmbuild/SOURCES
+          # Download source files defined in the spec
+          spectool -g -R gebaar-libinput-fork.spec -C ~/rpmbuild/SOURCES/
+
+      - name: Build Package
+        run: |
+          rpmbuild -ba gebaar-libinput-fork.spec
+
+      - name: Upload RPM Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: openmandriva-binaries
+          path: /github/home/rpmbuild/RPMS/*/*.rpm
