@@ -19,12 +19,11 @@ jobs:
           # Automatically install all BuildRequires from the spec
           dnf builddep -y gebaar-libinput-fork.spec
 
-      - name: Prepare Sources
+      - name: Build with ABB
         run: |
-          mkdir -p ~/rpmbuild/SOURCES
-          # Download source files defined in the spec
-          spectool -g -R gebaar-libinput-fork.spec -C ~/rpmbuild/SOURCES/
-
+          dnf install -y abb
+          # abb handles the download and the build in one go
+          abb build gebaar-libinput-fork.spec
       - name: Build Package
         run: |
           rpmbuild -ba gebaar-libinput-fork.spec
