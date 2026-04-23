@@ -1,35 +1,43 @@
-name: OpenMandriva CI
+name: OpenMandriva Build
 on: [push, pull_request]
 
 jobs:
-  build-rpm:
+  build:
     runs-on: ubuntu-latest
     container:
-      # 'cooker' is the rolling dev branch, 'rolling' is the stable rolling
-      image: openmandriva/cooker 
+      image: openmandriva/cooker
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install Build Environment
         run: |
-          # Install the 'build' metapackage which contains essential macros
-          dnf install -y rpm-openmandriva-setup-build dnf-utils spectool
-          # Automatically install all BuildRequires from the spec
+          # 2026: rpmdevtools contains 'spectool' for downloading sources
+          # rpm-openmandriva-setup-build contains the OMV-specific macros
+          dnf install -y rpm-build rpmdevtools dnf-utils rpm-openmandriva-setup-build
+          
+          # Automatically install spec-defined dependencies (cmake, ninja, etc.)
           dnf builddep -y gebaar-libinput-fork.spec
 
-      - name: Build with ABB
+      - name: Prepare RPM Directory
         run: |
-          dnf install -y abb
-          # abb handles the download and the build in one go
-          abb build gebaar-libinput-fork.spec
-      - name: Build Package
-        run: |
-          rpmbuild -ba gebaar-libinput-fork.spec
+          # Create the standard RPM build tree in the home directory
+          mkdir -p ~/rpmbuild/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
+          cp gebaar-libinput-fork.spec ~/rpmbuild/SPECS/
 
-      - name: Upload RPM Artifacts
+      - name: Download Sources
+        run: |
+          # Download the v0.1.5.tar.gz defined in the spec
+          spectool -g -R ~/rpmbuild/SPECS/gebaar-libinput-fork.spec -C ~/rpmbuild/SOURCES/
+
+      - name: Execute Build
+        run: |
+          # -ba builds both the binary RPM and the source RPM
+          rpmbuild -ba ~/rpmbuild/SPECS/gebaar-libinput-fork.spec
+
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: openmandriva-binaries
+          name: openmandriva-packages
           path: /github/home/rpmbuild/RPMS/*/*.rpm
