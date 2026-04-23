@@ -9,7 +9,6 @@ License:        GPLv3
 URL:            https://github.com/9ary/gebaar-libinput-fork
 Source0:        https://github.com/9ary/gebaar-libinput-fork/archive/refs/tags/v%{version}.tar.gz
 
-# Use pkgconfig/cmake names for 2026 stability
 BuildRequires:  cmake
 BuildRequires:  ninja
 BuildRequires:  pkgconfig(libinput)
@@ -25,17 +24,15 @@ A Super Simple WM Independent Touchpad Gesture Daemon for libinput.
 Forked version with additional features.
 
 %prep
-%autosetup -p1
+%autosetup -n %{name}-%{version}
 
 %build
-# OpenMandriva 2026 macros automatically handle optimization flags
-%cmake -G Ninja
-%ninja_build
+%cmake -G Ninja -S . -B build
+ninja -C build
 
 %install
-%ninja_install
+ninja -C build install DESTDIR=%{buildroot}
 
-# Explicitly handle documentation and license paths
 install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 install -Dm644 README.md %{buildroot}%{_docdir}/%{name}/README.md
 
