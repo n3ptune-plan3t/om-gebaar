@@ -1,0 +1,29 @@
+name: Build OpenMandriva RPM
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # We run the job inside the OpenMandriva container
+    container:
+      image: openmandriva/cooker 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          # Use dnf-builddep to automatically install what's in the .spec file
+          dnf install -y 'dnf-command(builddep)' rpm-build
+          dnf builddep -y your-package.spec
+
+      - name: Build RPM
+        run: |
+          rpmbuild -bb your-package.spec
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: openmandriva-rpm
+          path: ~/rpmbuild/RPMS/**/*.rpm
