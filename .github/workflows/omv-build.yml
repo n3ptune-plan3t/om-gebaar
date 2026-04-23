@@ -13,11 +13,11 @@ jobs:
 
       - name: Install Build Environment
         run: |
-          # 2026: rpmdevtools contains 'spectool' for downloading sources
-          # rpm-openmandriva-setup-build contains the OMV-specific macros
-          dnf install -y rpm-build rpmdevtools dnf-utils rpm-openmandriva-setup-build
+          # Install build tools and dependencies
+          # rpmdevtools is optional now since we download sources directly
+          dnf install -y rpm-build cmake ninja dnf-utils rpm-openmandriva-setup-build
           
-          # Automatically install spec-defined dependencies (cmake, ninja, etc.)
+          # Automatically install spec-defined dependencies (libinput, zlib, libudev, pkgconfig, etc.)
           dnf builddep -y gebaar-libinput-fork.spec
 
       - name: Prepare RPM Directory
@@ -28,8 +28,11 @@ jobs:
 
       - name: Download Sources
         run: |
-          # Download the v0.1.5.tar.gz defined in the spec
-          spectool -g -R ~/rpmbuild/SPECS/gebaar-libinput-fork.spec -C ~/rpmbuild/SOURCES/
+          # Download the source tarball directly from GitHub
+          cd ~/rpmbuild/SOURCES/
+          wget -q https://github.com/9ary/gebaar-libinput-fork/archive/refs/tags/v0.1.5.tar.gz
+          # Verify the download
+          ls -lh v0.1.5.tar.gz
 
       - name: Execute Build
         run: |
@@ -40,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: openmandriva-packages
-          path: /github/home/rpmbuild/RPMS/*/*.rpm
+          path: ~/rpmbuild/RPMS/*/*.rpm
