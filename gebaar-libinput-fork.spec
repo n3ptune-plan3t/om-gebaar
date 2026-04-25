@@ -6,8 +6,9 @@ Group:          System/Configuration/Hardware
 License:        GPLv3
 URL:            https://github.com/9ary/gebaar-libinput-fork
 Source0:        https://github.com/9ary/gebaar-libinput-fork/archive/refs/tags/v%{version}.tar.gz
-Patch0:         fix-stdcxxfs.patch
+#Patch0:         fix-stdcxxfs.patch
 
+BuildRequires:  clang
 BuildRequires:  cmake
 BuildRequires:  ninja
 BuildRequires:  pkgconfig(libinput)
@@ -24,6 +25,8 @@ Forked version with additional features.
 
 %prep
 %autosetup -n %{name}-%{version} -p1
+
+%define _build_compiler clang
 
 %build
 %cmake -G Ninja
