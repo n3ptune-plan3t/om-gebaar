@@ -11,9 +11,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify spec file
+        run: |
+          # Check for duplicate spec files
+          find . -name "*.spec" -type f
+          # Make sure gebaar-libinput-fork.spec exists and is valid
+          if [ ! -f gebaar-libinput-fork.spec ]; then
+            echo "ERROR: gebaar-libinput-fork.spec not found"
+            exit 1
+          fi
+
       - name: Install packaging tools
         run: |
-          dnf install -y packaging-tools
+          dnf install -y packaging-tools dnf-utils
 
       - name: Prepare package directory
         run: |
@@ -21,8 +31,12 @@ jobs:
           mkdir -p ~/abf/gebaar-libinput-fork
           cp gebaar-libinput-fork.spec ~/abf/gebaar-libinput-fork/
           cd ~/abf/gebaar-libinput-fork
-          # Also copy any other source files if needed
-          cp -r . ~/abf/gebaar-libinput-fork/ 2>/dev/null || true
+          ls -la
+
+      - name: Install build dependencies
+        run: |
+          # Install the build dependencies from the spec file
+          dnf builddep -y ~/abf/gebaar-libinput-fork/gebaar-libinput-fork.spec
 
       - name: Build with abb
         run: |
@@ -30,20 +44,23 @@ jobs:
           abb build
 
       - name: Upload RPM Artifacts
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: openmandriva-rpm
           path: ~/abf/gebaar-libinput-fork/RPMS/**/*.rpm
 
       - name: Upload Source RPM Artifacts
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: openmandriva-srpm
           path: ~/abf/gebaar-libinput-fork/SRPMS/**/*.rpm
 
-      - name: Check build log
+      - name: Check build log on failure
         if: failure()
         run: |
-          if [ -f ~/abf/gebaar-libinput-fork/build.log ]; then
-            cat ~/abf/gebaar-libinput-fork/build.log
-          fi
+          echo "=== Build failed, showing logs ==="
+          find ~/abf/gebaar-libinput-fork -name "*.buildlog" -exec cat {} \;
+          echo "=== Directory contents ==="
+          ls -la ~/abf/gebaar-libinput-fork/
