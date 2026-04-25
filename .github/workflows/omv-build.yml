@@ -13,7 +13,7 @@ jobs:
 
       - name: Verify spec file
         run: |
-          # Check for duplicate spec files
+          # Check for spec files
           find . -name "*.spec" -type f
           # Make sure gebaar-libinput-fork.spec exists and is valid
           if [ ! -f gebaar-libinput-fork.spec ]; then
@@ -30,6 +30,10 @@ jobs:
           # Follow the official OMV guide - create ~/abf/[package-name]
           mkdir -p ~/abf/gebaar-libinput-fork
           cp gebaar-libinput-fork.spec ~/abf/gebaar-libinput-fork/
+          # Copy patch files if they exist
+          if [ -f fix-stdcxxfs.patch ]; then
+            cp fix-stdcxxfs.patch ~/abf/gebaar-libinput-fork/
+          fi
           cd ~/abf/gebaar-libinput-fork
           ls -la
 
