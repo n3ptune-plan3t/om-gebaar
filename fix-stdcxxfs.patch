@@ -1,12 +1,15 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -16,7 +16,7 @@ find_package(PkgConfig)
+@@ -20,10 +20,10 @@ find_package(PkgConfig)
  if (PKG_CONFIG_FOUND)
      pkg_search_module(LIBINPUT REQUIRED libinput)
  endif ()
+ 
  find_package(udev)
+ 
 -target_link_libraries(gebaard ${LIBINPUT_LIBRARIES} ${UDEV_LIBRARIES} stdc++fs)
 +target_link_libraries(gebaard ${LIBINPUT_LIBRARIES} ${UDEV_LIBRARIES} stdc++)
  target_include_directories(gebaard PUBLIC ${LIBINPUT_INCLUDE_DIRS} ${UDEV_INCLUDE_DIRS} libs/cxxopts/include libs/cpptoml/include)
  target_compile_options(gebaard PUBLIC ${LIBINPUT_CFLAGS_OTHER} ${UDEV_CFLAGS_OTHER})
+ 
  install(TARGETS gebaard DESTINATION bin)
