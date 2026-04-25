@@ -11,36 +11,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Build Environment
+      - name: Install packaging tools
         run: |
-          # Install build tools and dependencies
-          # rpmdevtools is optional now since we download sources directly
-          dnf install -y rpm-build cmake ninja dnf-utils rpm-openmandriva-setup-build
-          
-          # Automatically install spec-defined dependencies (libinput, zlib, libudev, pkgconfig, etc.)
-          dnf builddep -y gebaar-libinput-fork.spec
+          dnf install -y packaging-tools
 
-      - name: Prepare RPM Directory
+      - name: Prepare package directory
         run: |
-          # Create the standard RPM build tree in the home directory
-          mkdir -p ~/rpmbuild/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
-          cp gebaar-libinput-fork.spec ~/rpmbuild/SPECS/
+          # Follow the official OMV guide - create ~/abf/[package-name]
+          mkdir -p ~/abf/gebaar-libinput-fork
+          cp gebaar-libinput-fork.spec ~/abf/gebaar-libinput-fork/
+          cd ~/abf/gebaar-libinput-fork
+          # Also copy any other source files if needed
+          cp -r . ~/abf/gebaar-libinput-fork/ 2>/dev/null || true
 
-      - name: Download Sources
+      - name: Build with abb
         run: |
-          # Download the source tarball directly from GitHub using curl
-          cd ~/rpmbuild/SOURCES/
-          curl -L -o v0.1.5.tar.gz https://github.com/9ary/gebaar-libinput-fork/archive/refs/tags/v0.1.5.tar.gz
-          # Verify the download
-          ls -lh v0.1.5.tar.gz
+          cd ~/abf/gebaar-libinput-fork
+          abb build
 
-      - name: Execute Build
-        run: |
-          # -ba builds both the binary RPM and the source RPM
-          rpmbuild -ba ~/rpmbuild/SPECS/gebaar-libinput-fork.spec
-
-      - name: Upload Artifacts
+      - name: Upload RPM Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: openmandriva-packages
-          path: ~/rpmbuild/RPMS/*/*.rpm
+          name: openmandriva-rpm
+          path: ~/abf/gebaar-libinput-fork/RPMS/**/*.rpm
+
+      - name: Upload Source RPM Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: openmandriva-srpm
+          path: ~/abf/gebaar-libinput-fork/SRPMS/**/*.rpm
+
+      - name: Check build log
+        if: failure()
+        run: |
+          if [ -f ~/abf/gebaar-libinput-fork/build.log ]; then
+            cat ~/abf/gebaar-libinput-fork/build.log
+          fi
