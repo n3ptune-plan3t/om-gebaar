@@ -15,7 +15,7 @@ jobs:
       - name: Install Build Dependencies
         run: |
           # Sync repositories and install necessary tools
-          dnf install -y rpm-build rpm-openmandriva-setup-build dnf-utils
+          dnf install -y rpm-build rpm-openmandriva-setup-build dnf-utils packaging-tools curl
           # Automatically install BuildRequires from your .spec file
           dnf builddep -y gebaar-libinput-fork.spec
 
