@@ -30,7 +30,8 @@ jobs:
           
           # 3. Move your spec file to the SPECS folder
           cp gebaar-libinput-fork.spec ~/rpmbuild/SPECS/
-
+          cp fix-stdcxxfs.patch ~/rpmbuild/SOURCES
+          
       - name: Build znver1 RPM
         run: |
           # rpmbuild -ba: build all (binary and source)
