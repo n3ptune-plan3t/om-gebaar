@@ -27,37 +27,6 @@ jobs:
           # If you have source tarballs in your repo, move them to SOURCES
           # cp *.tar.gz ~/rpmbuild/SOURCES/
 
-      - name: Build RPM
-        run: |
-          name: Build OpenMandriva RPM
-on: [push, pull_request]
-
-jobs:
-  build-rpm:
-    runs-on: ubuntu-latest
-    container:
-      image: openmandriva/cooker
-      options: --privileged  # Required if your build needs special permissions
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Build Dependencies
-        run: |
-          # Sync repositories and install necessary tools
-          dnf install -y rpm-build rpm-openmandriva-setup-build dnf-utils
-          # Automatically install BuildRequires from your .spec file
-          dnf builddep -y gebaar-libinput-fork.spec
-
-      - name: Prepare RPM Environment
-        run: |
-          # Create the standard rpmbuild directory structure
-          mkdir -p ~/rpmbuild/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
-          cp gebaar-libinput-fork.spec ~/rpmbuild/SPECS/
-          # If you have source tarballs in your repo, move them to SOURCES
-          # cp *.tar.gz ~/rpmbuild/SOURCES/
-
       - name: Build znver1 RPM
         run: |
           rpmbuild -ba --target znver1 ~/rpmbuild/SPECS/gebaar-libinput-fork.spec
