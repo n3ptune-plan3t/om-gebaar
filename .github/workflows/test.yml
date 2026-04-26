@@ -21,16 +21,22 @@ jobs:
 
       - name: Prepare RPM Environment
         run: |
-          # Create the standard rpmbuild directory structure
+          # 1. Create the standard RPM directory tree
           mkdir -p ~/rpmbuild/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
+          
+          # 2. Fetch the source into SOURCES folder
+          # -L follows redirects, -o names it exactly what rpmbuild expects
+          curl -L "https://github.com/9ary/gebaar-libinput-fork/archive/refs/tags/v0.1.5.tar.gz" -o ~/rpmbuild/SOURCES/v0.1.5.tar.gz
+          
+          # 3. Move your spec file to the SPECS folder
           cp gebaar-libinput-fork.spec ~/rpmbuild/SPECS/
-          # If you have source tarballs in your repo, move them to SOURCES
-          # cp *.tar.gz ~/rpmbuild/SOURCES/
 
       - name: Build znver1 RPM
         run: |
+          # rpmbuild -ba: build all (binary and source)
+          # --target znver1: optimize for your Ryzen 3250U
           rpmbuild -ba --target znver1 ~/rpmbuild/SPECS/gebaar-libinput-fork.spec
-
+          
       - name: Upload znver1 Artifacts
         uses: actions/upload-artifact@v4
         with:
