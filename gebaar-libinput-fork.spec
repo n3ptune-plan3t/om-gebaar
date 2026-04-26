@@ -1,6 +1,6 @@
 Name:           gebaar-libinput-fork
 Version:        0.1.5
-Release:        2
+Release:        1
 Summary:        WM Independent Touchpad Gesture Daemon for libinput
 Group:          System/Configuration/Hardware
 License:        GPLv3
@@ -9,7 +9,6 @@ Source0:        https://github.com/9ary/gebaar-libinput-fork/archive/refs/tags/v
 Patch0:         fix-stdcxxfs.patch
 
 BuildRequires:  cmake
-BuildRequires:  ninja
 BuildRequires:  pkgconfig(libinput)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(libudev)
@@ -22,17 +21,4 @@ Provides:       gebaar
 A Super Simple WM Independent Touchpad Gesture Daemon for libinput.
 Forked version with additional features.
 
-%prep
-%autosetup -n %{name}-%{version} -p1
-
-%build
-%cmake -G Ninja
-%ninja_build
-
-%install
-%ninja_install
-
-%files
-%{_bindir}/gebaard
-%license LICENSE
-%doc README.md
+BuildSystem: cmake
