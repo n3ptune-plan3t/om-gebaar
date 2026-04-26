@@ -8,7 +8,6 @@ URL:            https://github.com/9ary/gebaar-libinput-fork
 Source0:        https://github.com/9ary/gebaar-libinput-fork/archive/refs/tags/v%{version}.tar.gz
 Patch0:         fix-stdcxxfs.patch
 
-BuildRequires:  cmake
 BuildRequires:  pkgconfig(libinput)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(libudev)
