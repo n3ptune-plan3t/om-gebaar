@@ -52,14 +52,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: openmandriva-rpm
-          path: ~/abf/gebaar-libinput-fork/RPMS/**/*.rpm
+          path: ~/abf/gebaar-libinput-fork/RPMS/*.rpm
 
       - name: Upload Source RPM Artifacts
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: openmandriva-srpm
-          path: ~/abf/gebaar-libinput-fork/SRPMS/**/*.rpm
+          path: ~/abf/gebaar-libinput-fork/SRPMS/*.rpm
 
       - name: Check build log on failure
         if: failure()
